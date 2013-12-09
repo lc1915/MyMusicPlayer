@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MyMusicPlayer</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="welcome">Hello!Welcome to this music player!Now,choose the way to import your music</string>
+    <string name="choose_music_from_sdcard">从SD卡中读取音乐</string>
+    <string name="play_inner_music">播放自带的音乐</string>
+
+</resources>
