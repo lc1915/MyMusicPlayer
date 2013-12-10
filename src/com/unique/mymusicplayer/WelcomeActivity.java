@@ -22,7 +22,7 @@ public class WelcomeActivity extends Activity{
         	@Override
 			public void onClick(View v) {
         		Intent intent = new Intent();
-				intent.setClass(WelcomeActivity.this, MusicListActivity.class);
+				intent.setClass(WelcomeActivity.this, MusicListActivity0.class);
 				startActivity(intent);
 				finish();
         	}

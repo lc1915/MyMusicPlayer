@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,6 +18,7 @@ public class PlayActivity extends Activity {
 	private Button playButton, pauseButton, stopButton;
 	private Button lastButton, nextButton;
 	private MediaPlayer mediaPlayer = new MediaPlayer();
+	boolean isplay = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,50 +31,47 @@ public class PlayActivity extends Activity {
 		startService(intent0);
 
 		playButton = (Button) findViewById(R.id.play);
-		pauseButton = (Button) findViewById(R.id.pause);
-		stopButton = (Button) findViewById(R.id.stop);
+		// pauseButton = (Button) findViewById(R.id.pause);
+		// stopButton = (Button) findViewById(R.id.stop);
 		lastButton = (Button) findViewById(R.id.last);
 		nextButton = (Button) findViewById(R.id.next);
 
 		playButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(PlayActivity.this, PlayService.class);
-				intent.putExtra("play_position", 1);
-				startService(intent);
-
-				mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-					@Override
-					public void onCompletion(MediaPlayer mp) {
-						mp.release();
-					}
-				});
-			}
-		});
-
-		pauseButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (mediaPlayer != null) {
+				if (isplay) {
+					playButton.setBackgroundResource(R.drawable.pause_selector);
+					Log.e("aaa", "正在播放");
+					Intent intent = new Intent(PlayActivity.this,
+							PlayService.class);
+					intent.putExtra("play_position", 1);
+					startService(intent);
+					isplay = false;
+				} else {
+					playButton.setBackgroundResource(R.drawable.play_selector);
+					Log.e("aaa", "暂停");
 					Intent intent = new Intent(PlayActivity.this,
 							PlayService.class);
 					intent.putExtra("play_position", 2);
 					startService(intent);
+					isplay = true;
 				}
 			}
 		});
 
-		stopButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (mediaPlayer != null) {
-					Intent intent = new Intent(PlayActivity.this,
-							PlayService.class);
-					intent.putExtra("play_position", 0);
-					startService(intent);
-				}
-			}
-		});
+		/*
+		 * pauseButton.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View v) { if (mediaPlayer != null) {
+		 * Intent intent = new Intent(PlayActivity.this, PlayService.class);
+		 * intent.putExtra("play_position", 2); startService(intent); } } });
+		 * 
+		 * stopButton.setOnClickListener(new OnClickListener() {
+		 * 
+		 * @Override public void onClick(View v) { if (mediaPlayer != null) {
+		 * Intent intent = new Intent(PlayActivity.this, PlayService.class);
+		 * intent.putExtra("play_position", 0); startService(intent); } } });
+		 */
 
 		lastButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -83,6 +82,7 @@ public class PlayActivity extends Activity {
 				if (i < 0) {
 					Toast.makeText(getApplicationContext(), "已是第一首歌",
 							Toast.LENGTH_LONG).show();
+					i=0;
 				} else {
 					intent.putExtra("position", i);
 					startService(intent);
@@ -99,6 +99,7 @@ public class PlayActivity extends Activity {
 				if (i > 2) {
 					Toast.makeText(getApplicationContext(), "已是最后一首歌",
 							Toast.LENGTH_LONG).show();
+					i=2;
 				} else {
 					intent.putExtra("position", i);
 					startService(intent);

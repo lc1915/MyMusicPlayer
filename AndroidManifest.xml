@@ -14,6 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <service android:name="com.unique.mymusicplayer.PlayService" /> 
+        <service android:name="com.unique.mymusicplayer.PlayService0" /> 
         <activity
             android:name="com.unique.mymusicplayer.Welcome"
             android:label="@string/app_name" >
@@ -31,7 +32,13 @@
             android:name="com.unique.mymusicplayer.PlayActivity">
         </activity>
         <activity
+            android:name="com.unique.mymusicplayer.PlayActivity0">
+        </activity>
+        <activity
             android:name="com.unique.mymusicplayer.MusicListActivity">
+        </activity>
+        <activity
+            android:name="com.unique.mymusicplayer.MusicListActivity0">
         </activity>
     </application>
 
