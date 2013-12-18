@@ -65,6 +65,18 @@ public class MusicListActivity extends Activity {
 		i = listPosition;
 		Intent intent = new Intent(MusicListActivity.this, PlayActivity.class);
 		intent.putExtra("position", i);
+		if(i==0){
+		intent.putExtra("title", "魔鬼中的天使");     
+        intent.putExtra("artist","田馥甄"); 
+		}
+		else if(i==1){
+			intent.putExtra("title", "心酸");     
+	        intent.putExtra("artist","林宥嘉"); 
+		}
+		else if(i==2){
+			intent.putExtra("title", "分手快乐");     
+	        intent.putExtra("artist","梁静茹"); 
+		}
 		startActivity(intent);
 	}
 

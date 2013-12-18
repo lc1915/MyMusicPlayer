@@ -10,13 +10,16 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class PlayActivity extends Activity {
 
 	int position;
-	private Button playButton, pauseButton, stopButton;
+	private Button playButton;
 	private Button lastButton, nextButton;
+	TextView titleTextView;
+	TextView artistTextView;
 	private MediaPlayer mediaPlayer = new MediaPlayer();
 	boolean isplay = false;
 
@@ -30,6 +33,11 @@ public class PlayActivity extends Activity {
 		intent0.putExtra("position", i);
 		startService(intent0);
 
+		Intent intent = getIntent();
+		titleTextView=(TextView)findViewById(R.id.musicArtist);
+		titleTextView.setText(intent.getStringExtra("title"));
+		artistTextView=(TextView)findViewById(R.id.musicTitle);
+		artistTextView.setText(intent.getStringExtra("artist"));
 		playButton = (Button) findViewById(R.id.play);
 		// pauseButton = (Button) findViewById(R.id.pause);
 		// stopButton = (Button) findViewById(R.id.stop);
@@ -59,23 +67,11 @@ public class PlayActivity extends Activity {
 			}
 		});
 
-		/*
-		 * pauseButton.setOnClickListener(new OnClickListener() {
-		 * 
-		 * @Override public void onClick(View v) { if (mediaPlayer != null) {
-		 * Intent intent = new Intent(PlayActivity.this, PlayService.class);
-		 * intent.putExtra("play_position", 2); startService(intent); } } });
-		 * 
-		 * stopButton.setOnClickListener(new OnClickListener() {
-		 * 
-		 * @Override public void onClick(View v) { if (mediaPlayer != null) {
-		 * Intent intent = new Intent(PlayActivity.this, PlayService.class);
-		 * intent.putExtra("play_position", 0); startService(intent); } } });
-		 */
-
 		lastButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				playButton.setBackgroundResource(R.drawable.pause_selector);
+				isplay = false;
 				Intent intent = new Intent(PlayActivity.this, PlayService.class);
 				int i = PlayService.i;
 				i--;
@@ -93,6 +89,8 @@ public class PlayActivity extends Activity {
 		nextButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				playButton.setBackgroundResource(R.drawable.pause_selector);
+				isplay = false;
 				Intent intent = new Intent(PlayActivity.this, PlayService.class);
 				int i = PlayService.i;
 				i++;

@@ -13,8 +13,19 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <service android:name="com.unique.mymusicplayer.PlayService" /> 
-        <service android:name="com.unique.mymusicplayer.PlayService0" /> 
+
+        <!-- 注册服务 -->
+        <service
+            android:name="com.unique.mymusicplayer.PlayService0"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.unique.media.MUSIC_SERVICE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+        <service android:name="com.unique.mymusicplayer.PlayService" />
+
         <activity
             android:name="com.unique.mymusicplayer.Welcome"
             android:label="@string/app_name" >
@@ -24,22 +35,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <activity
-            android:name="com.unique.mymusicplayer.WelcomeActivity">
+        <activity android:name="com.unique.mymusicplayer.WelcomeActivity" >
         </activity>
-        <activity
-            android:name="com.unique.mymusicplayer.PlayActivity">
+        <activity android:name="com.unique.mymusicplayer.PlayActivity" >
         </activity>
-        <activity
-            android:name="com.unique.mymusicplayer.PlayActivity0">
+        <activity android:name="com.unique.mymusicplayer.PlayActivity0" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
-        <activity
-            android:name="com.unique.mymusicplayer.MusicListActivity">
+        <activity android:name="com.unique.mymusicplayer.MusicListActivity" >
         </activity>
-        <activity
-            android:name="com.unique.mymusicplayer.MusicListActivity0">
+        <activity android:name="com.unique.mymusicplayer.MusicListActivity0" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

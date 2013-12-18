@@ -38,7 +38,6 @@
                 android:id="@+id/musicTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="singer"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#eda470" />
 
@@ -46,26 +45,16 @@
                 android:id="@+id/musicArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="artist"
-                android:textColor="#F8E493" 
+                android:textColor="#F8E493"
                 android:textSize="18sp" />
-
         </LinearLayout>
     </RelativeLayout>
 
-    <ScrollView
-        android:id="@+id/lrcScrollView"
+    <com.unique.mymusicplayer.LrcView
+        android:id="@+id/lrcShowView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/header_layout" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="歌词"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-    </ScrollView>
+        android:layout_height="250dip"
+        android:layout_below="@id/header_layout" />
 
     <RelativeLayout
         android:id="@+id/footer_layout"
@@ -81,27 +70,23 @@
 
             <SeekBar
                 android:id="@+id/audioTrack"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:background="@drawable/player_progress_bg"
-                android:progressDrawable="@drawable/seekbar_img"
-                android:thumb="@drawable/media_player_progress_button" />
+                android:layout_centerVertical="true" />
 
             <TextView
                 android:id="@+id/current_progress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/audioTrack"
-                android:text="0:00" />
+                android:layout_below="@id/audioTrack" />
 
             <TextView
                 android:id="@+id/final_progress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_below="@id/audioTrack"
-                android:text="3:59" />
+                android:layout_below="@id/audioTrack" />
         </RelativeLayout>
 
         <RelativeLayout
