@@ -52,6 +52,20 @@
             </intent-filter>
         </activity>
 
+        <receiver android:name="com.unique.mymusicplayer.WidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.unique.action.START_APP_WIDGET" />
+                <action android:name="com.unique.action.FRONT_APP_WIDGET" />
+                <action android:name="com.unique.action.NEXT_APP_WIDGET" />
+                <action android:name="com.unique.action.STOP_APP_WIDGET" />
+                
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_provider" />
+        </receiver>
     </application>
 
 </manifest>

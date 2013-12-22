@@ -24,7 +24,6 @@ public class MusicListActivity0 extends Activity {
 	static int i;
 	String duration;
 	static List<Mp3Info> mp3Infos;
-	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,15 +69,14 @@ public class MusicListActivity0 extends Activity {
 			HashMap<String, String> map = new HashMap<String, String>();
 			map.put("title", mp3Info.getTitle());
 			map.put("artist", mp3Info.getArtist());
-			duration=formatTime(mp3Info.getDuration());
+			duration = formatTime(mp3Info.getDuration());
 			map.put("duration", duration);
 			map.put("size", String.valueOf(mp3Info.getSize()));
 			map.put("url", mp3Info.getUrl());
 			mp3list.add(map);
 		}
-		
-		 
-		//在列表中显示歌曲标题和时长
+
+		// 在列表中显示歌曲标题和时长
 		mAdapter = new SimpleAdapter(this, mp3list,
 				android.R.layout.simple_list_item_2, new String[] { "title",
 						"duration" }, new int[] { android.R.id.text1,
@@ -91,8 +89,8 @@ public class MusicListActivity0 extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				listPosition = position;  
-	            playMusic(listPosition); 
+				listPosition = position;
+				playMusic(listPosition);
 			}
 		});
 
@@ -101,36 +99,41 @@ public class MusicListActivity0 extends Activity {
 	}
 
 	public void playMusic(int listPosition) {
-		if (mp3Infos != null) {  
-            Mp3Info mp3Info = mp3Infos.get(listPosition);   
-            Intent intent = new Intent(MusicListActivity0.this, PlayActivity0.class); 
-            intent.putExtra("title", mp3Info.getTitle());     
-            intent.putExtra("url", mp3Info.getUrl());  
-            intent.putExtra("artist", mp3Info.getArtist());  
-            intent.putExtra("listPosition", listPosition);  
-            intent.putExtra("MSG", Constant.PlayerMsg.PLAY_MSG);  
-            startActivity(intent);  
-        }  
+		if (mp3Infos != null) {
+			Mp3Info mp3Info = mp3Infos.get(listPosition);
+			Intent intent = new Intent(MusicListActivity0.this,
+					PlayActivity0.class);
+			intent.putExtra("title", mp3Info.getTitle());
+			intent.putExtra("url", mp3Info.getUrl());
+			intent.putExtra("artist", mp3Info.getArtist());
+			intent.putExtra("listPosition", listPosition);
+			intent.putExtra("changed", 0);
+			intent.putExtra("MSG", Constant.PlayerMsg.PLAY_MSG);
+			startActivity(intent);
+			finish();
+		}
+	}
+
+	// 格式化时间，将毫秒转换为分:秒格式
+	public static String formatTime(long time) {
+		String min = time / (1000 * 60) + "";
+		String sec = time % (1000 * 60) + "";
+		if (min.length() < 2) {
+			min = "0" + time / (1000 * 60) + "";
+		} else {
+			min = time / (1000 * 60) + "";
+		}
+		if (sec.length() == 4) {
+			sec = "0" + (time % (1000 * 60)) + "";
+		} else if (sec.length() == 3) {
+			sec = "00" + (time % (1000 * 60)) + "";
+		} else if (sec.length() == 2) {
+			sec = "000" + (time % (1000 * 60)) + "";
+		} else if (sec.length() == 1) {
+			sec = "0000" + (time % (1000 * 60)) + "";
+		}
+		return min + ":" + sec.trim().substring(0, 2);
 	}
 	
-	//格式化时间，将毫秒转换为分:秒格式 
-    public static String formatTime(long time) {  
-        String min = time / (1000 * 60) + "";  
-        String sec = time % (1000 * 60) + "";  
-        if (min.length() < 2) {  
-            min = "0" + time / (1000 * 60) + "";  
-        } else {  
-            min = time / (1000 * 60) + "";  
-        }  
-        if (sec.length() == 4) {  
-            sec = "0" + (time % (1000 * 60)) + "";  
-        } else if (sec.length() == 3) {  
-            sec = "00" + (time % (1000 * 60)) + "";  
-        } else if (sec.length() == 2) {  
-            sec = "000" + (time % (1000 * 60)) + "";  
-        } else if (sec.length() == 1) {  
-            sec = "0000" + (time % (1000 * 60)) + "";  
-        }  
-        return min + ":" + sec.trim().substring(0, 2);  
-    }  
+	
 }

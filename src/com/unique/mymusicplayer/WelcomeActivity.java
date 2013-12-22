@@ -28,7 +28,7 @@ public class WelcomeActivity extends Activity{
         	}
         });
         
-        playInnerMusicButton = (Button) findViewById(R.id.play_inner_music_button);
+        /*playInnerMusicButton = (Button) findViewById(R.id.play_inner_music_button);
         playInnerMusicButton.setOnClickListener(new View.OnClickListener() {
         	@Override
 			public void onClick(View v) {
@@ -37,7 +37,7 @@ public class WelcomeActivity extends Activity{
 				startActivity(intent);
 				finish();
         	}
-        });
+        });*/
     }
 
 

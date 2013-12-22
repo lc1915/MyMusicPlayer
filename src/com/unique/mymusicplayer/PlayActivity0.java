@@ -3,15 +3,18 @@ package com.unique.mymusicplayer;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -28,14 +31,15 @@ public class PlayActivity0 extends Activity {
 	private Button playBtn; // 播放（播放、暂停）
 	private Button shuffleBtn; // 随机播放
 	private Button nextBtn; // 下一首
+	private Button queueBtn; // 播放列表
 	private SeekBar music_progressBar; // 歌曲进度
 	private TextView currentProgress; // 当前进度消耗的时间
 	private TextView finalProgress; // 歌曲时间
 
 	private static String title; // 歌曲标题
 	private static String artist; // 歌曲艺术家
-	private static String url; // 歌曲路径
-	private int listPosition; // 播放歌曲在mp3Infos的位置
+	static String url; // 歌曲路径
+	private static int listPosition; // 播放歌曲在mp3Infos的位置
 	private int currentTime; // 当前歌曲播放时间
 	private int duration; // 歌曲长度
 	private int flag; // 播放标识
@@ -48,6 +52,7 @@ public class PlayActivity0 extends Activity {
 	private boolean isShuffle = false; // 随机播放
 	private boolean isPlaying; // 正在播放
 	private boolean isPause; // 暂停
+	private static int changed = 0;
 
 	private List<Mp3Info> mp3Infos;
 	public static LrcView lrcView; // 自定义歌词视图
@@ -68,6 +73,7 @@ public class PlayActivity0 extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.play_music);
+
 		musicTitle = (TextView) findViewById(R.id.musicTitle);
 		musicArtist = (TextView) findViewById(R.id.musicArtist);
 
@@ -88,38 +94,73 @@ public class PlayActivity0 extends Activity {
 		// TODO Auto-generated method stub
 		super.onStart();
 
-		if(url==null){
-		intent = getIntent();
-		Log.e(TAG, intent.getStringExtra("title"));
-		title = intent.getStringExtra("title");
-		artist = intent.getStringExtra("artist");
-		url = intent.getStringExtra("url");
-		Log.e(TAG, "AAA" + url);
-		listPosition = intent.getIntExtra("listPosition", listPosition);
-		Log.e(TAG, "AAA" + listPosition);
-		int MSG = 0;
-		flag = intent.getIntExtra("MSG", MSG);
-		}else{
+		if (url == null) {
+			intent = getIntent();
+			Log.e(TAG, intent.getStringExtra("title"));
+			title = intent.getStringExtra("title");
+			artist = intent.getStringExtra("artist");
+			url = intent.getStringExtra("url");
 			Log.e(TAG, "AAA" + url);
+			listPosition = intent.getIntExtra("listPosition", listPosition);
+			Log.e(TAG, "AAA" + listPosition);
+			int MSG = 0;
+			flag = intent.getIntExtra("MSG", MSG);
+		} else {
+			Log.e(TAG, "BBB" + url);
+
+			listPosition = MusicListActivity0.listPosition;
+			Mp3Info mp3Info = MusicListActivity0.mp3Infos.get(listPosition);
+			url = mp3Info.getUrl();
+
 		}
 
 		try {
 			// 获取通知管理器
 			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-			PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,intent, 0);
+			PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+					intent, 0);
 
 			// 创建Notification 即通知
 			Notification notification = new Notification();
 			// 设置通知图标
 			notification.icon = R.drawable.ic_launcher;
 			// 设置通知栏显示的信息与点击发出的PendingIntent，其实就是自身播放器这个activity。
-			notification.setLatestEventInfo(this, "正在播放音乐", "啊哈哈",
+			notification.setLatestEventInfo(this, "正在播放音乐", title,
 					pendingIntent);
 			// 发出Notification
 			notificationManager.notify(0, notification);
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (changed == 0) {
+
+				listPosition = MusicListActivity0.listPosition;
+				Mp3Info mp3Info = MusicListActivity0.mp3Infos.get(listPosition);
+				url = mp3Info.getUrl();
+				Intent intent = new Intent(PlayActivity0.this,
+						PlayService0.class);
+				intent.putExtra("title", mp3Info.getTitle());
+				intent.putExtra("url", mp3Info.getUrl());
+				Log.e(TAG, mp3Info.getUrl());
+				Log.e(TAG, changed + "");
+				intent.putExtra("artist", mp3Info.getArtist());
+				intent.putExtra("listPosition", listPosition);
+				intent.putExtra("progress", currentTime);
+				intent.putExtra("MSG", Constant.PlayerMsg.PLAY_MSG);
+				startService(intent);
+			} else {
+				Intent intent = new Intent(PlayActivity0.this,
+						PlayService0.class);
+				intent.putExtra("title", title);
+				intent.putExtra("url", url);
+				Log.e(TAG + "111", url);
+				Log.e(TAG, changed + "");
+				intent.putExtra("artist", artist);
+				Log.e(TAG, "listposition=" + listPosition);
+				intent.putExtra("listPosition", listPosition);
+				intent.putExtra("progress", currentTime);
+				intent.putExtra("MSG", Constant.PlayerMsg.PLAY_MSG);
+				startService(intent);
+			}
 		}
 
 		initView();
@@ -135,6 +176,7 @@ public class PlayActivity0 extends Activity {
 		playBtn = (Button) findViewById(R.id.play);
 		shuffleBtn = (Button) findViewById(R.id.shuffle_music);
 		nextBtn = (Button) findViewById(R.id.next);
+		queueBtn = (Button) findViewById(R.id.play_queue);
 		music_progressBar = (SeekBar) findViewById(R.id.audioTrack);
 		currentProgress = (TextView) findViewById(R.id.current_progress);
 		finalProgress = (TextView) findViewById(R.id.final_progress);
@@ -149,6 +191,7 @@ public class PlayActivity0 extends Activity {
 		playBtn.setOnClickListener(ViewOnClickListener);
 		shuffleBtn.setOnClickListener(ViewOnClickListener);
 		nextBtn.setOnClickListener(ViewOnClickListener);
+		queueBtn.setOnClickListener(ViewOnClickListener);
 		music_progressBar
 				.setOnSeekBarChangeListener(new SeekBarChangeListener());
 	}
@@ -195,7 +238,11 @@ public class PlayActivity0 extends Activity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		unregisterReceiver(playerReceiver);
+		try {
+			unregisterReceiver(playerReceiver);
+		} catch (Exception e) {
+
+		}
 	}
 
 	@Override
@@ -231,11 +278,13 @@ public class PlayActivity0 extends Activity {
 			case R.id.last: // 上一首歌曲
 				isPlaying = true;
 				isPause = false;
+				changed = 1;
 				previous_music();
 				break;
 			case R.id.next: // 下一首歌曲
 				isPlaying = true;
 				isPause = false;
+				changed = 1;
 				next_music();
 				break;
 			case R.id.repeat_music: // 重复播放音乐
@@ -305,6 +354,12 @@ public class PlayActivity0 extends Activity {
 					sendBroadcast(shuffleIntent);
 				}
 				break;
+			case R.id.play_queue:// 播放列表
+				Intent intent0 = new Intent();
+				intent0.setClass(PlayActivity0.this, MusicListActivity0.class);
+				startActivity(intent0);
+				finish();
+				break;
 			}
 		}
 	}
@@ -357,7 +412,10 @@ public class PlayActivity0 extends Activity {
 		intent.putExtra("url", url);
 		intent.putExtra("listPosition", listPosition);
 		if (isPause) {
-			intent.putExtra("MSG", Constant.PlayerMsg.PAUSE_MSG);
+			playBtn.setBackgroundResource(R.drawable.pause_selector);
+			intent.putExtra("MSG", Constant.PlayerMsg.PROGRESS_CHANGE);
+			isPause = false;
+			isPlaying = true;
 		} else {
 			intent.putExtra("MSG", Constant.PlayerMsg.PROGRESS_CHANGE);
 		}
@@ -390,6 +448,7 @@ public class PlayActivity0 extends Activity {
 	public void previous_music() {
 		playBtn.setBackgroundResource(R.drawable.pause_selector);
 		listPosition--;
+		changed = 1;
 		if (listPosition >= 0) {
 			Mp3Info mp3Info = mp3Infos.get(listPosition); // 上一首MP3
 			musicTitle.setText(mp3Info.getTitle());
@@ -430,6 +489,36 @@ public class PlayActivity0 extends Activity {
 		}
 	}
 
+	// 按返回键弹出对话框确定退出
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK
+				&& event.getAction() == KeyEvent.ACTION_DOWN) {
+
+			new AlertDialog.Builder(this)
+					.setIcon(R.drawable.ic_launcher)
+					.setTitle("退出")
+					.setMessage("你确定要退出音乐播放器吗？")
+					.setNegativeButton("取消", null)
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									finish();
+									Intent intent = new Intent(
+											PlayActivity0.this,
+											PlayService0.class);
+									// unregisterReceiver(playerReceiver);
+									stopService(intent); // 停止后台服务
+								}
+							}).show();
+
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
 	// 用来接收从service传回来的广播的内部类
 	public class PlayerReceiver extends BroadcastReceiver {
 
@@ -449,7 +538,9 @@ public class PlayActivity0 extends Activity {
 			} else if (action.equals(UPDATE_ACTION)) {
 				// 获取Intent中的current消息，current代表当前正在播放的歌曲
 				listPosition = intent.getIntExtra("current", -1);
+				Log.e(TAG, listPosition + "");
 				url = mp3Infos.get(listPosition).getUrl();
+				Log.e(TAG, url);
 				if (listPosition >= 0) {
 					musicTitle.setText(mp3Infos.get(listPosition).getTitle());
 					musicArtist.setText(mp3Infos.get(listPosition).getArtist());

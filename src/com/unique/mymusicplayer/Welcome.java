@@ -30,7 +30,7 @@ public class Welcome extends Activity {
         } else {    
             Log.e("debug", "不是第一次运行");   
             Intent intent = new Intent();  
-            intent.setClass(Welcome.this,WelcomeActivity.class);  
+            intent.setClass(Welcome.this,MusicListActivity0.class);  
             startActivity(intent);  
             finish();
         }    

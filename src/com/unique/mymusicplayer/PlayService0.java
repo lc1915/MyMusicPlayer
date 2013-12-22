@@ -16,10 +16,11 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 @SuppressLint("NewApi")
 public class PlayService0 extends Service {
-	private MediaPlayer mediaPlayer; // 媒体播放器对象
+	static MediaPlayer mediaPlayer; // 媒体播放器对象
 	private String path; // 音乐文件路径
 	private int msg;
 	private boolean isPause; // 暂停状态
@@ -41,6 +42,11 @@ public class PlayService0 extends Service {
 	public static final String MUSIC_CURRENT = "com.unique.action.MUSIC_CURRENT"; // 当前音乐播放时间更新动作
 	public static final String MUSIC_DURATION = "com.unique.action.MUSIC_DURATION";// 新音乐长度更新动作
 	public static final String SHOW_LRC = "com.unique.action.SHOW_LRC"; // 通知显示歌词
+
+	private static final String START_ACTION = "com.unique.action.START_APP_WIDGET";
+	private static final String FRONT_ACTION = "com.unique.action.FRONT_APP_WIDGET";
+	private static final String NEXT_ACTION = "com.unique.action.NEXT_APP_WIDGET";
+	private static final String PAUSE_ACTION = "com.unique.action.PAUSE_APP_WIDGET";
 
 	// handler用来接收消息，来发送广播更新播放时间
 	@SuppressLint("HandlerLeak")
@@ -118,6 +124,10 @@ public class PlayService0 extends Service {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(PlayActivity0.CONTROL_ACTION);
 		filter.addAction(SHOW_LRC);
+		filter.addAction(START_ACTION);
+		filter.addAction(FRONT_ACTION);
+		filter.addAction(NEXT_ACTION);
+		filter.addAction(PAUSE_ACTION);
 		registerReceiver(myReceiver, filter);
 	}
 
@@ -134,9 +144,18 @@ public class PlayService0 extends Service {
 
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.e("PlayService0", "onStart");
-		path = intent.getStringExtra("url"); // 歌曲路径
-		current = intent.getIntExtra("listPosition", -1); // 当前播放歌曲的在mp3Infos的位置
-		msg = intent.getIntExtra("MSG", 0); // 播放信息
+		if (intent.getStringExtra("url") != null) {
+			path = intent.getStringExtra("url"); // 歌曲路径
+			current = intent.getIntExtra("listPosition", -1); // 当前播放歌曲的在mp3Infos的位置
+			msg = intent.getIntExtra("MSG", 0); // 播放信息
+			Log.e("PlayService0", "if");
+		} else {
+			path = PlayActivity0.url;
+			msg = intent.getIntExtra("MSG", 0); // 播放信息
+			Log.e(TAG, path);
+			Log.e(TAG, msg + "");
+			Log.e("PlayService0", "else");
+		}
 
 		if (msg == Constant.PlayerMsg.PLAY_MSG) { // 直接播放音乐
 			play(0);
@@ -165,8 +184,22 @@ public class PlayService0 extends Service {
 	public void initLrc() {
 		mLrcProcess = new LrcProcess();
 		// 读取歌词文件
-		Log.e(TAG, "aaaaaaaaaaaaaaaaaa" + mp3Infos.get(current).getUrl());
-		mLrcProcess.readLRC(mp3Infos.get(current).getUrl());
+		Log.e(TAG, "aaaaaaaaaaaaaaaaaa" + path);
+		mLrcProcess.readLRC(path);
+		// 传回处理后的歌词文件
+		lrcList = mLrcProcess.getLrcList();
+		PlayActivity0.lrcView.setmLrcList(lrcList);
+		// 切换带动画显示歌词
+		PlayActivity0.lrcView.setAnimation(AnimationUtils.loadAnimation(
+				PlayService0.this, R.anim.alpha_z));
+		handler.post(mRunnable);
+	}
+
+	public void initLrc0() {
+		mLrcProcess = new LrcProcess();
+		// 读取歌词文件
+		Log.e(TAG, "aaaaaaaaaaaaaaaaaa" + PlayActivity0.url);
+		mLrcProcess.readLRC(PlayActivity0.url);
 		// 传回处理后的歌词文件
 		lrcList = mLrcProcess.getLrcList();
 		PlayActivity0.lrcView.setmLrcList(lrcList);
@@ -191,9 +224,13 @@ public class PlayService0 extends Service {
 	 * @return
 	 */
 	public int lrcIndex() {
-		if (mediaPlayer.isPlaying()) {
-			currentTime = mediaPlayer.getCurrentPosition();
-			duration = mediaPlayer.getDuration();
+		try {
+			if (mediaPlayer.isPlaying()) {
+				currentTime = mediaPlayer.getCurrentPosition();
+				duration = mediaPlayer.getDuration();
+			}
+		} catch (Exception e) {
+
 		}
 		if (currentTime < duration) {
 			for (int i = 0; i < lrcList.size(); i++) {
@@ -249,6 +286,7 @@ public class PlayService0 extends Service {
 	private void previous() {
 		Intent sendIntent = new Intent(UPDATE_ACTION);
 		sendIntent.putExtra("current", current);
+		Log.e(TAG, current + "");
 		// 发送广播，将被Activity组件中的BroadcastReceiver接收到
 		sendBroadcast(sendIntent);
 		play(0);
@@ -264,7 +302,7 @@ public class PlayService0 extends Service {
 	}
 
 	// 停止音乐
-	private void stop() {
+	static void stop() {
 		if (mediaPlayer != null) {
 			mediaPlayer.stop();
 			try {
@@ -311,6 +349,7 @@ public class PlayService0 extends Service {
 	public class MyReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			Log.e(TAG, "a");
 			int control = intent.getIntExtra("control", -1);
 			switch (control) {
 			case 1:
@@ -330,7 +369,40 @@ public class PlayService0 extends Service {
 			if (action.equals(SHOW_LRC)) {
 				current = intent.getIntExtra("listPosition", -1);
 				initLrc();
+			} else if (action.equals(PAUSE_ACTION)) {
+				Log.e(TAG, "pause");
+				pause();
+			} else if (action.equals(FRONT_ACTION)) {
+				Log.e(TAG, "previous");
+				try {
+					current--;
+					String url = mp3Infos.get(current).getUrl();
+					Log.e(TAG, url);
+					mediaPlayer.reset();// 把各项参数恢复到初始状态
+					mediaPlayer.setDataSource(url);
+					mediaPlayer.prepare(); // 进行缓冲
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				Log.e(TAG, current + "");
+			} else if (action.equals(NEXT_ACTION)) {
+				Log.e(TAG, "next");
+				try {
+					current++;
+					Log.e(TAG, current + "current");
+					String url = mp3Infos.get(current).getUrl();
+					Log.e(TAG, url);
+					mediaPlayer.reset();// 把各项参数恢复到初始状态
+					mediaPlayer.setDataSource(url);
+					mediaPlayer.prepare(); // 进行缓冲
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				Log.e(TAG, current + "");
+			} else if (action.equals(START_ACTION)) {
+				play(currentTime);
 			}
+
 		}
 	}
 
