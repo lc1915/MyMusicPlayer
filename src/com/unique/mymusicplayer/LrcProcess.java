@@ -94,7 +94,7 @@ public class LrcProcess {
 		return stringBuilder.toString();
 	}
 
-	//解析歌词时间 歌词内容格式如下： [00:02.32]陈奕迅 [00:03.43]好久不见 [00:05.22]歌词制作 王涛
+	//解析歌词
 	public int time2Str(String timeStr) {
 		timeStr = timeStr.replace(":", ".");
 		timeStr = timeStr.replace(".", "@");

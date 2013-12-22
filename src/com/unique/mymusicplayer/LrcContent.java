@@ -4,11 +4,11 @@ import java.util.Map;
 
 //歌词实体类
 public class LrcContent {
-	private String title;// music title
-	private String artist;// artist name
-	private String album;// album name
-	private String bySomeBody;// the lrc maker
-	private String offset;// the time delay or bring forward
+	private String title;
+	private String artist;
+	private String album;
+	private String bySomeBody;
+	private String offset;
 	private Map<Long, String> infos;// 保存歌词信息和时间点一一对应的Map
 
 	public String getTitle() {

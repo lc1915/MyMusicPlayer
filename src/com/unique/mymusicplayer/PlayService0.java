@@ -218,11 +218,7 @@ public class PlayService0 extends Service {
 		}
 	};
 
-	/**
-	 * 根据时间获取歌词显示的索引值
-	 * 
-	 * @return
-	 */
+	//根据时间获取歌词显示的索引值
 	public int lrcIndex() {
 		try {
 			if (mediaPlayer.isPlaying()) {
